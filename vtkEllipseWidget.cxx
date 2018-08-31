@@ -1,7 +1,7 @@
 /*=========================================================================
 Program:   Visualization Toolkit
 Module:    vtkEllipseWidget.cxx
-Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen, Ko Ka Long
+Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
 All rights reserved.
 See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
 This software is distributed WITHOUT ANY WARRANTY; without even
@@ -63,7 +63,27 @@ void vtkEllipseWidget::SetCursor(int cState)
 
 	switch (cState)
 	{
-	case vtkEllipseRepresentation::Edge:
+	case vtkEllipseRepresentation::AdjustingP0:
+		this->RequestCursorShape(VTK_CURSOR_SIZESW);
+		break;
+	case vtkEllipseRepresentation::AdjustingP1:
+		this->RequestCursorShape(VTK_CURSOR_SIZESE);
+		break;
+	case vtkEllipseRepresentation::AdjustingP2:
+		this->RequestCursorShape(VTK_CURSOR_SIZENE);
+		break;
+	case vtkEllipseRepresentation::AdjustingP3:
+		this->RequestCursorShape(VTK_CURSOR_SIZENW);
+		break;
+	case vtkEllipseRepresentation::AdjustingE0:
+	case vtkEllipseRepresentation::AdjustingE2:
+		this->RequestCursorShape(VTK_CURSOR_SIZENS);
+		break;
+	case vtkEllipseRepresentation::AdjustingE1:
+	case vtkEllipseRepresentation::AdjustingE3:
+		this->RequestCursorShape(VTK_CURSOR_SIZEWE);
+		break;
+	case vtkEllipseRepresentation::Inside:
 		if (reinterpret_cast<vtkEllipseRepresentation*>(this->WidgetRep)->GetMoving())
 		{
 			this->RequestCursorShape(VTK_CURSOR_SIZEALL);
@@ -206,13 +226,13 @@ void vtkEllipseWidget::MoveAction(vtkAbstractWidget *w)
 			EllipseRepresentation->MovingOn();
 		}
 
-		//if ((EllipseRepresentation->GetShowVerticalEllipse() == vtkEllipseRepresentation::Ellipse_ACTIVE ||
-		//	EllipseRepresentation->GetShowHorizontalEllipse() == vtkEllipseRepresentation::Ellipse_ACTIVE) &&
-		//	stateBefore != stateAfter &&
-		//	(stateBefore == vtkEllipseRepresentation::Outside || stateAfter == vtkEllipseRepresentation::Outside))
-		//{
-		//	self->Render();
-		//}
+		if ((EllipseRepresentation->GetShowVerticalEllipse() == vtkEllipseRepresentation::Ellipse_ACTIVE ||
+			EllipseRepresentation->GetShowHorizontalEllipse() == vtkEllipseRepresentation::Ellipse_ACTIVE) &&
+			stateBefore != stateAfter &&
+			(stateBefore == vtkEllipseRepresentation::Outside || stateAfter == vtkEllipseRepresentation::Outside))
+		{
+			self->Render();
+		}
 		return;
 	}
 

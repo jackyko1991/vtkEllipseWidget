@@ -1,7 +1,7 @@
 /*=========================================================================
 Program:   Visualization Toolkit
 Module:    vtkEllipseWidget.h
-Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen, Ko Ka Long
+Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
 All rights reserved.
 See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
 This software is distributed WITHOUT ANY WARRANTY; without even
@@ -10,18 +10,18 @@ PURPOSE.  See the above copyright notice for more information.
 =========================================================================*/
 /**
 * @class   vtkEllipseWidget
-* @brief   place an ellipse around a 2D rectangular region
+* @brief   place a Ellipse around a 2D rectangular region
 *
-* This class is a superclass for 2D widgets that may require an ellipse with rectangular border.
-* Besides drawing an ellipse, the widget provides methods for resizing
-* and moving the shape (and associated border). The widget
+* This class is a superclass for 2D widgets that may require a rectangular
+* Ellipse. Besides drawing a Ellipse, the widget provides methods for resizing
+* and moving the rectangular region (and associated Ellipse). The widget
 * provides methods and internal data members so that subclasses can take
 * advantage of this widgets capabilities, requiring only that the subclass
 * defines a "representation", i.e., some combination of props or actors
-* that can be managed in the 2D ellipitical region.
+* that can be managed in the 2D rectangular region.
 *
 * The class defines basic positioning functionality, including the ability
-* to size the widget with locked x/y proportions. The area within the ellipse
+* to size the widget with locked x/y proportions. The area within the Ellipse
 * may be made "selectable" as well, meaning that a selection event interior
 * to the widget invokes a virtual SelectRegion() method, which can be used
 * to pick objects or otherwise manipulate data interior to the widget.
@@ -30,14 +30,16 @@ PURPOSE.  See the above copyright notice for more information.
 * By default, the widget responds to the following VTK events (i.e., it
 * watches the vtkRenderWindowInteractor for these events):
 * <pre>
-* On the boundary of the ellipse:
+* On the boundary of the widget:
 *   LeftButtonPressEvent - select boundary
 *   LeftButtonReleaseEvent - deselect boundary
-*   MouseMoveEvent - move the widget
-* On the corners of the widget:
-*   LeftButtonPressEvent - resize the widget.
+*   MouseMoveEvent - move/resize widget depending on which portion of the
+*                    boundary was selected.
+* On the interior of the widget:
+*   LeftButtonPressEvent - invoke SelectButton() callback (if the ivar
+*                          Selectable is on)
 * Anywhere on the widget:
-*   MiddleButtonPressEvent - no event
+*   MiddleButtonPressEvent - move the widget
 * </pre>
 *
 * @par Event Bindings:
@@ -71,8 +73,9 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkAbstractWidget.h"
 
 class vtkEllipseRepresentation;
-class vtkSeedRepresentation;
 
+
+//class VTKINTERACTIONWIDGETS_EXPORT vtkEllipseWidget : public vtkAbstractWidget
 class vtkEllipseWidget : public vtkAbstractWidget
 {
 public:

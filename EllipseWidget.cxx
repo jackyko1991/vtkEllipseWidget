@@ -49,16 +49,16 @@ void vtkCustomEllipseWidget::EndSelectAction(vtkAbstractWidget *w)
 	vtkSmartPointer<vtkPolyData> polydata =
 		vtkSmartPointer<vtkPolyData>::New();
 
-	// Get the bottom left corner
-	double* lowerLeft;
-	lowerLeft = static_cast<vtkEllipseRepresentation*>(ellipseWidget->GetRepresentation())->GetPosition();
-	std::cout << "Lower left: " << lowerLeft[0] << " "
-		<< lowerLeft[1] << std::endl;
+	//// Get the bottom left corner
+	//double* lowerLeft;
+	//lowerLeft = static_cast<vtkEllipseRepresentation*>(ellipseWidget->GetRepresentation())->GetPosition();
+	//std::cout << "Lower left: " << lowerLeft[0] << " "
+	//	<< lowerLeft[1] << std::endl;
 
-	double* upperRight;
-	upperRight = static_cast<vtkEllipseRepresentation*>(ellipseWidget->GetRepresentation())->GetPosition2();
-	std::cout << "Upper right: " << upperRight[0] << " "
-		<< upperRight[1] << std::endl;
+	//double* upperRight;
+	//upperRight = static_cast<vtkEllipseRepresentation*>(ellipseWidget->GetRepresentation())->GetPosition2();
+	//std::cout << "Upper right: " << upperRight[0] << " "
+	//	<< upperRight[1] << std::endl;
 
 	vtkEllipseWidget::EndSelectAction(w);
 }
@@ -100,11 +100,11 @@ int main(int, char *[])
 
 	// Add the actors to the scene
 	renderer->AddActor(actor);
-	vtkEllipseRepresentation* representation = static_cast<vtkEllipseRepresentation*>(ellipseWidget->GetRepresentation());
+	//vtkEllipseRepresentation* representation = static_cast<vtkEllipseRepresentation*>(ellipseWidget->GetRepresentation());
 
-	auto actor2D= vtkSmartPointer<vtkActor2D>::New();
-	actor2D->SetMapper(representation->EWMapper);
-	renderer->AddActor2D(actor2D);
+	//auto actor2D= vtkSmartPointer<vtkActor2D>::New();
+	//actor2D->SetMapper(representation->EWMapper);
+	//renderer->AddActor2D(actor2D);
 
 	// Render an image (lights and cameras are created automatically)
 	renderWindowInteractor->Initialize();
