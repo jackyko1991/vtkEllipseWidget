@@ -168,8 +168,11 @@ protected:
 	virtual int SubclassEndSelectAction() { return 0; }
 	virtual int SubclassMoveAction() { return 0; }
 
-	// helper methods for cursoe management
+	// helper methods for cursor management
 	void SetCursor(int State) override;
+
+	// helper mathos for edge color highlight
+	void SetEdgeColor(int State);
 
 	//widget state
 	int WidgetState;

@@ -64,23 +64,15 @@ void vtkEllipseWidget::SetCursor(int cState)
 	switch (cState)
 	{
 	case vtkEllipseRepresentation::AdjustingP0:
-		this->RequestCursorShape(VTK_CURSOR_SIZESW);
-		break;
-	case vtkEllipseRepresentation::AdjustingP1:
-		this->RequestCursorShape(VTK_CURSOR_SIZESE);
-		break;
-	case vtkEllipseRepresentation::AdjustingP2:
-		this->RequestCursorShape(VTK_CURSOR_SIZENE);
-		break;
-	case vtkEllipseRepresentation::AdjustingP3:
-		this->RequestCursorShape(VTK_CURSOR_SIZENW);
-		break;
-	case vtkEllipseRepresentation::AdjustingE0:
-	case vtkEllipseRepresentation::AdjustingE2:
 		this->RequestCursorShape(VTK_CURSOR_SIZENS);
 		break;
-	case vtkEllipseRepresentation::AdjustingE1:
-	case vtkEllipseRepresentation::AdjustingE3:
+	case vtkEllipseRepresentation::AdjustingP1:
+		this->RequestCursorShape(VTK_CURSOR_SIZEWE);
+		break;
+	case vtkEllipseRepresentation::AdjustingP2:
+		this->RequestCursorShape(VTK_CURSOR_SIZENS);
+		break;
+	case vtkEllipseRepresentation::AdjustingP3:
 		this->RequestCursorShape(VTK_CURSOR_SIZEWE);
 		break;
 	case vtkEllipseRepresentation::Inside:
@@ -122,6 +114,9 @@ void vtkEllipseWidget::SelectAction(vtkAbstractWidget *w)
 	// cursor (i.e., the MoveAction may have set the cursor previously, but this
 	// method is necessary to maintain the proper cursor shape)..
 	self->SetCursor(self->WidgetRep->GetInteractionState());
+
+	// edge color
+	//self->SetEdgeColor(self->WidgetRep->)
 
 	// convert to normalized viewport coordinates
 	double XF = static_cast<double>(X);

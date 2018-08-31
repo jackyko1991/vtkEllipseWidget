@@ -187,14 +187,11 @@ public:
 	{
 		Outside = 0,
 		Inside,
+		Edge,
 		AdjustingP0,
 		AdjustingP1,
 		AdjustingP2,
 		AdjustingP3,
-		AdjustingE0,
-		AdjustingE1,
-		AdjustingE2,
-		AdjustingE3
 	};
 
 	/**
