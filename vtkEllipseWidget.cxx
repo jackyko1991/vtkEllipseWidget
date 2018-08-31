@@ -226,8 +226,7 @@ void vtkEllipseWidget::MoveAction(vtkAbstractWidget *w)
 			EllipseRepresentation->MovingOn();
 		}
 
-		if ((EllipseRepresentation->GetShowVerticalEllipse() == vtkEllipseRepresentation::Ellipse_ACTIVE ||
-			EllipseRepresentation->GetShowHorizontalEllipse() == vtkEllipseRepresentation::Ellipse_ACTIVE) &&
+		if (EllipseRepresentation->GetShowEllipse() == vtkEllipseRepresentation::ELLIPSE_ACTIVE &&
 			stateBefore != stateAfter &&
 			(stateBefore == vtkEllipseRepresentation::Outside || stateAfter == vtkEllipseRepresentation::Outside))
 		{

@@ -87,37 +87,37 @@ public:
 	* Ellipse will never appear.  If ShowEllipse is "active" then the Ellipse
 	* will appear when the mouse pointer enters the region bounded by the
 	* Ellipse widget.
-	* This method is provided as conveniency to set both horizontal and
-	* vertical Ellipses.
 	* Ellipse_ON by default.
-	* See Also: SetShowHorizontalEllipse(), SetShowVerticalEllipse()
 	*/
-	virtual void SetShowEllipse(int Ellipse);
-	virtual int GetShowEllipseMinValue();
-	virtual int GetShowEllipseMaxValue();
-	virtual int GetShowEllipse();
+	vtkSetClampMacro(ShowEllipse, int, ELLIPSE_OFF, ELLIPSE_ACTIVE);
+	vtkGetMacro(ShowEllipse, int);
+	//virtual void SetShowEllipse(int Ellipse);
+	
+	//virtual int GetShowEllipseMinValue();
+	//virtual int GetShowEllipseMaxValue();
+	//virtual int GetShowEllipse();
 	void SetShowEllipseToOff() { this->SetShowEllipse(ELLIPSE_OFF); }
 	void SetShowEllipseToOn() { this->SetShowEllipse(ELLIPSE_ON); }
 	void SetShowEllipseToActive() { this->SetShowEllipse(ELLIPSE_ACTIVE); }
 	//@}
 
-	//@{
-	/**
-	* Specify when and if the vertical Ellipse should appear.
-	* See Also: SetShowEllipse(), SetShowHorizontalEllipse()
-	*/
-	vtkSetClampMacro(ShowVerticalEllipse, int, ELLIPSE_OFF, ELLIPSE_ACTIVE);
-	vtkGetMacro(ShowVerticalEllipse, int);
-	//@}
+	////@{
+	///**
+	//* Specify when and if the Ellipse should appear.
+	//* See Also: SetShowEllipse(), SetShowHorizontalEllipse()
+	//*/
+	//vtkSetClampMacro(ShowEllipse, int, ELLIPSE_OFF, ELLIPSE_ACTIVE);
+	//vtkGetMacro(ShowVerticalEllipse, int);
+	////@}
 
-	//@{
-	/**
-	* Specify when and if the horizontal Ellipse should appear.
-	* See Also: SetShowEllipse(), SetShowVerticalEllipse()
-	*/
-	vtkSetClampMacro(ShowHorizontalEllipse, int, ELLIPSE_OFF, ELLIPSE_ACTIVE);
-	vtkGetMacro(ShowHorizontalEllipse, int);
-	//@}
+	////@{
+	///**
+	//* Specify when and if the horizontal Ellipse should appear.
+	//* See Also: SetShowEllipse(), SetShowVerticalEllipse()
+	//*/
+	//vtkSetClampMacro(ShowHorizontalEllipse, int, ELLIPSE_OFF, ELLIPSE_ACTIVE);
+	//vtkGetMacro(ShowHorizontalEllipse, int);
+	////@}
 
 	//@{
 	/**
@@ -236,8 +236,7 @@ protected:
 	~vtkEllipseRepresentation() override;
 
 	// Ivars
-	int           ShowVerticalEllipse;
-	int           ShowHorizontalEllipse;
+	int			  ShowEllipse;
 	vtkProperty2D *EllipseProperty;
 	vtkTypeBool           ProportionalResize;
 	int           Tolerance;
@@ -254,10 +253,10 @@ protected:
 	int Negotiated;
 	virtual void NegotiateLayout();
 
-	// Update the Ellipse visibility based on InteractionState.
-	// See Also: SetShowHorizontalEllipse(), SetShowHorizontalEllipse(),
-	// ComputeInteractionState()
-	virtual void UpdateShowEllipse();
+	//// Update the Ellipse visibility based on InteractionState.
+	//// See Also: SetShowHorizontalEllipse(), SetShowHorizontalEllipse(),
+	//// ComputeInteractionState()
+	//virtual void UpdateShowEllipse();
 
 	// Keep track of start position when moving Ellipse
 	double StartPosition[2];

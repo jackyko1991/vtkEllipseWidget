@@ -32,8 +32,7 @@ vtkEllipseRepresentation::vtkEllipseRepresentation()
 {
 	this->InteractionState = vtkEllipseRepresentation::Outside;
 
-	this->ShowVerticalEllipse = Ellipse_ON;
-	this->ShowHorizontalEllipse = Ellipse_ON;
+	this->ShowEllipse = ELLIPSE_ON;
 	this->ProportionalResize = 0;
 	this->Tolerance = 3;
 	this->Resolution = 50;
@@ -130,32 +129,18 @@ vtkMTimeType vtkEllipseRepresentation::GetMTime()
 	return mTime;
 }
 
-//-------------------------------------------------------------------------
-void vtkEllipseRepresentation::SetShowEllipse(int Ellipse)
-{
-	this->SetShowVerticalEllipse(Ellipse);
-	this->SetShowHorizontalEllipse(Ellipse);
-	this->UpdateShowEllipse();
-}
+////-------------------------------------------------------------------------
+//void vtkEllipseRepresentation::SetShowEllipse(int Ellipse)
+//{
+//	this->UpdateShowEllipse();
+//}
 
-//-------------------------------------------------------------------------
-int vtkEllipseRepresentation::GetShowEllipseMinValue()
-{
-	return Ellipse_OFF;
-}
-
-//-------------------------------------------------------------------------
-int vtkEllipseRepresentation::GetShowEllipseMaxValue()
-{
-	return Ellipse_ACTIVE;
-}
-
-//-------------------------------------------------------------------------
-int vtkEllipseRepresentation::GetShowEllipse()
-{
-	return this->GetShowVerticalEllipse() != Ellipse_OFF ?
-		this->GetShowVerticalEllipse() : this->GetShowHorizontalEllipse();
-}
+////-------------------------------------------------------------------------
+//int vtkEllipseRepresentation::GetShowEllipse()
+//{
+//	return this->GetShowVerticalEllipse() != Ellipse_OFF ?
+//		this->GetShowVerticalEllipse() : this->GetShowHorizontalEllipse();
+//}
 
 //-------------------------------------------------------------------------
 void vtkEllipseRepresentation::StartWidgetInteraction(double eventPos[2])
@@ -341,9 +326,9 @@ int vtkEllipseRepresentation::ComputeInteractionState(int X, int Y, int vtkNotUs
 		int e2 = (Y >= (pos2[1] - this->Tolerance) && Y <= (pos2[1] + this->Tolerance));
 		int e3 = (X >= (pos1[0] - this->Tolerance) && X <= (pos1[0] + this->Tolerance));
 
-		int adjustHorizontalEdges = (this->ShowHorizontalEllipse != Ellipse_OFF);
-		int adjustVerticalEdges = (this->ShowVerticalEllipse != Ellipse_OFF);
-		int adjustPoints = (adjustHorizontalEdges && adjustVerticalEdges);
+		//int adjustHorizontalEdges = (this->ShowHorizontalEllipse != Ellipse_OFF);
+		//int adjustVerticalEdges = (this->ShowVerticalEllipse != Ellipse_OFF);
+		int adjustPoints = (this->ShowEllipse != ELLIPSE_OFF);
 
 		if (e0 && e1 && adjustPoints)
 		{
@@ -362,26 +347,26 @@ int vtkEllipseRepresentation::ComputeInteractionState(int X, int Y, int vtkNotUs
 			this->InteractionState = vtkEllipseRepresentation::AdjustingP0;
 		}
 
-		// Edges
-		else if (e0 || e1 || e2 || e3)
-		{
-			if (e0 && adjustHorizontalEdges)
-			{
-				this->InteractionState = vtkEllipseRepresentation::AdjustingE0;
-			}
-			else if (e1 && adjustVerticalEdges)
-			{
-				this->InteractionState = vtkEllipseRepresentation::AdjustingE1;
-			}
-			else if (e2 && adjustHorizontalEdges)
-			{
-				this->InteractionState = vtkEllipseRepresentation::AdjustingE2;
-			}
-			else if (e3 && adjustVerticalEdges)
-			{
-				this->InteractionState = vtkEllipseRepresentation::AdjustingE3;
-			}
-		}
+		//// Edges
+		//else if (e0 || e1 || e2 || e3)
+		//{
+		//	if (e0 && adjustHorizontalEdges)
+		//	{
+		//		this->InteractionState = vtkEllipseRepresentation::AdjustingE0;
+		//	}
+		//	else if (e1 && adjustVerticalEdges)
+		//	{
+		//		this->InteractionState = vtkEllipseRepresentation::AdjustingE1;
+		//	}
+		//	else if (e2 && adjustHorizontalEdges)
+		//	{
+		//		this->InteractionState = vtkEllipseRepresentation::AdjustingE2;
+		//	}
+		//	else if (e3 && adjustVerticalEdges)
+		//	{
+		//		this->InteractionState = vtkEllipseRepresentation::AdjustingE3;
+		//	}
+		//}
 
 		else // must be interior
 		{
@@ -399,100 +384,91 @@ int vtkEllipseRepresentation::ComputeInteractionState(int X, int Y, int vtkNotUs
 			}
 		}
 	}//else inside or on Ellipse
-	this->UpdateShowEllipse();
+	//this->UpdateShowEllipse();
 
 	return this->InteractionState;
 }
 
-//-------------------------------------------------------------------------
-void vtkEllipseRepresentation::UpdateShowEllipse()
-{
-	enum {
-		NoEllipse = 0x00,
-		VerticalEllipse = 0x01,
-		HorizontalEllipse = 0x02,
-		AllEllipses = VerticalEllipse | HorizontalEllipse
-	};
-	int currentEllipse = NoEllipse;
-	switch (this->EWPolyData->GetLines()->GetNumberOfCells())
-	{
-	case 1:
-		currentEllipse = AllEllipses;
-		break;
-	case 2:
-	{
-		vtkIdType npts = 0;
-		vtkIdType* pts = nullptr;
-		this->EWPolyData->GetLines()->GetCell(0, npts, pts);
-		assert(npts == 2);
-		currentEllipse = (pts[0] == 0 ? HorizontalEllipse : VerticalEllipse);
-		break;
-	}
-	case 0:
-	default: // not supported
-		currentEllipse = NoEllipse;
-		break;
-	}
-	int newEllipse = NoEllipse;
-	if (this->ShowVerticalEllipse == this->ShowHorizontalEllipse)
-	{
-		newEllipse =
-			(this->ShowVerticalEllipse == Ellipse_ON ||
-			(this->ShowVerticalEllipse == Ellipse_ACTIVE &&
-				this->InteractionState != vtkEllipseRepresentation::Outside)) ? AllEllipses : NoEllipse;
-	}
-	else
-	{
-		newEllipse = newEllipse |
-			((this->ShowVerticalEllipse == Ellipse_ON ||
-			(this->ShowVerticalEllipse == Ellipse_ACTIVE &&
-				this->InteractionState != vtkEllipseRepresentation::Outside)) ? VerticalEllipse : NoEllipse);
-		newEllipse = newEllipse |
-			((this->ShowHorizontalEllipse == Ellipse_ON ||
-			(this->ShowHorizontalEllipse == Ellipse_ACTIVE &&
-				this->InteractionState != vtkEllipseRepresentation::Outside)) ? HorizontalEllipse : NoEllipse);
-	}
-	bool visible = (newEllipse != NoEllipse);
-	if (currentEllipse != newEllipse &&
-		visible)
-	{
-		vtkCellArray *outline = vtkCellArray::New();
-		switch (newEllipse)
-		{
-		case AllEllipses:
-			outline->InsertNextCell(5);
-			outline->InsertCellPoint(0);
-			outline->InsertCellPoint(1);
-			outline->InsertCellPoint(2);
-			outline->InsertCellPoint(3);
-			outline->InsertCellPoint(0);
-			break;
-		case VerticalEllipse:
-			outline->InsertNextCell(2);
-			outline->InsertCellPoint(1);
-			outline->InsertCellPoint(2);
-			outline->InsertNextCell(2);
-			outline->InsertCellPoint(3);
-			outline->InsertCellPoint(0);
-			break;
-		case HorizontalEllipse:
-			outline->InsertNextCell(2);
-			outline->InsertCellPoint(0);
-			outline->InsertCellPoint(1);
-			outline->InsertNextCell(2);
-			outline->InsertCellPoint(2);
-			outline->InsertCellPoint(3);
-			break;
-		default:
-			break;
-		}
-		this->EWPolyData->SetLines(outline);
-		outline->Delete();
-		this->EWPolyData->Modified();
-		this->Modified();
-	}
-	this->EWActor->SetVisibility(visible);
-}
+////-------------------------------------------------------------------------
+//void vtkEllipseRepresentation::UpdateShowEllipse()
+//{
+//	enum {
+//		NoEllipse = 0x00,
+//		ShowEllipse = 0x01
+//	};
+//	int currentEllipse = NoEllipse;
+//	switch (this->EWPolyData->GetLines()->GetNumberOfCells())
+//	{
+//	case 3:
+//		currentEllipse = ShowEllipse;
+//		break;
+//	case 0:
+//	case 1:
+//	case 2: 
+//	default: // not supported
+//		currentEllipse = NoEllipse;
+//		break;
+//	}
+//	int newEllipse = NoEllipse;
+//	if (this->ShowEllipse == this->ShowHorizontalEllipse)
+//	{
+//		newEllipse =
+//			(this->ShowVerticalEllipse == Ellipse_ON ||
+//			(this->ShowVerticalEllipse == Ellipse_ACTIVE &&
+//				this->InteractionState != vtkEllipseRepresentation::Outside)) ? ShowEllipse : NoEllipse;
+//	}
+//	else
+//	{
+//		newEllipse = newEllipse |
+//			((this->ShowVerticalEllipse == Ellipse_ON ||
+//			(this->ShowVerticalEllipse == Ellipse_ACTIVE &&
+//				this->InteractionState != vtkEllipseRepresentation::Outside)) ? VerticalEllipse : NoEllipse);
+//		newEllipse = newEllipse |
+//			((this->ShowHorizontalEllipse == Ellipse_ON ||
+//			(this->ShowHorizontalEllipse == Ellipse_ACTIVE &&
+//				this->InteractionState != vtkEllipseRepresentation::Outside)) ? HorizontalEllipse : NoEllipse);
+//	}
+//	bool visible = (newEllipse != NoEllipse);
+//	if (currentEllipse != newEllipse &&
+//		visible)
+//	{
+//		vtkCellArray *outline = vtkCellArray::New();
+//		switch (newEllipse)
+//		{
+//		case AllEllipses:
+//			outline->InsertNextCell(5);
+//			outline->InsertCellPoint(0);
+//			outline->InsertCellPoint(1);
+//			outline->InsertCellPoint(2);
+//			outline->InsertCellPoint(3);
+//			outline->InsertCellPoint(0);
+//			break;
+//		case VerticalEllipse:
+//			outline->InsertNextCell(2);
+//			outline->InsertCellPoint(1);
+//			outline->InsertCellPoint(2);
+//			outline->InsertNextCell(2);
+//			outline->InsertCellPoint(3);
+//			outline->InsertCellPoint(0);
+//			break;
+//		case HorizontalEllipse:
+//			outline->InsertNextCell(2);
+//			outline->InsertCellPoint(0);
+//			outline->InsertCellPoint(1);
+//			outline->InsertNextCell(2);
+//			outline->InsertCellPoint(2);
+//			outline->InsertCellPoint(3);
+//			break;
+//		default:
+//			break;
+//		}
+//		this->EWPolyData->SetLines(outline);
+//		outline->Delete();
+//		this->EWPolyData->Modified();
+//		this->Modified();
+//	}
+//	this->EWActor->SetVisibility(visible);
+//}
 
 //-------------------------------------------------------------------------
 void vtkEllipseRepresentation::BuildRepresentation()
@@ -600,30 +576,16 @@ void vtkEllipseRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {
 	this->Superclass::PrintSelf(os, indent);
 
-	os << indent << "Show Vertical Ellipse: ";
-	if (this->ShowVerticalEllipse == Ellipse_OFF)
+	os << indent << "Show Ellipse: ";
+	if (this->ShowEllipse == ELLIPSE_OFF)
 	{
 		os << "Off\n";
 	}
-	else if (this->ShowVerticalEllipse == Ellipse_ON)
+	else if (this->ShowEllipse == ELLIPSE_ON)
 	{
 		os << "On\n";
 	}
 	else //if ( this->ShowVerticalEllipse == Ellipse_ACTIVE)
-	{
-		os << "Active\n";
-	}
-
-	os << indent << "Show Horizontal Ellipse: ";
-	if (this->ShowHorizontalEllipse == Ellipse_OFF)
-	{
-		os << "Off\n";
-	}
-	else if (this->ShowHorizontalEllipse == Ellipse_ON)
-	{
-		os << "On\n";
-	}
-	else //if ( this->ShowHorizontalEllipse == Ellipse_ACTIVE)
 	{
 		os << "Active\n";
 	}
