@@ -113,7 +113,6 @@ void vtkEllipseWidget::SetEdgeColor(int cState)
 	{
 		vtkSmartPointer<vtkPropCollection>actorCollection = vtkSmartPointer<vtkPropCollection>::New();
 		this->GetEllipseRepresentation()->GetActors2D(actorCollection);
-		//actorCollection->Print(std::cout);
 		vtkActor2D* ellipseActor = (vtkActor2D*)(actorCollection->GetLastProp());
 		ellipseActor->GetProperty()->SetColor(1, 1, 1);
 		this->Interactor->Render();
