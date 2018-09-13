@@ -2,7 +2,7 @@
 
 A VTK widget to place ellipse shape bounded by a 2D rectangular region.
 
-<p align="left"> 
+<p align="center"> 
 <img src="./screenshot.png" width="302px" height="332px" title="EllipseWidget"/>
 </p>
 
