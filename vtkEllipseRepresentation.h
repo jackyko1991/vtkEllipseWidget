@@ -155,7 +155,7 @@ public:
 	/**
 	* The tolerance representing the distance to the widget (in pixels)
 	* in which the cursor is considered to be on the widget, or on a
-	* widget feature (e.g., a corner point or edge).
+	* widget feature (e.g., a control point or ellipse edge).
 	*/
 	vtkSetClampMacro(Tolerance, int, 1, 10);
 	vtkGetMacro(Tolerance, int);
@@ -236,7 +236,7 @@ protected:
 	int			  ShowEllipse;
 	vtkProperty2D *EllipseProperty;
 	vtkTypeBool           ProportionalResize;
-	int           Tolerance;
+	int           Tolerance;;
 	vtkTypeBool           Moving;
 	double        SelectionPoint[2];
 	int			  Resolution;

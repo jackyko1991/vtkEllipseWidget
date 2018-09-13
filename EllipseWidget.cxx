@@ -97,6 +97,7 @@ int main(int, char *[])
 	ellipseWidget->SetInteractor(renderWindowInteractor);
 	ellipseWidget->CreateDefaultRepresentation();
 	ellipseWidget->SelectableOff();
+	//ellipseWidget->GetEllipseRepresentation()->MovingOff();
 
 	// Add the actors to the scene
 	renderer->AddActor(actor);

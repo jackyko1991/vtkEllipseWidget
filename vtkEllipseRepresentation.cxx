@@ -195,59 +195,6 @@ void vtkEllipseRepresentation::WidgetInteraction(double eventPos[2])
 	case vtkEllipseRepresentation::AdjustingP3:
 		par1[0] = par1[0] + delX;
 		break;
-
-	//case vtkEllipseRepresentation::AdjustingP0:
-	//	par1[0] = par1[0] + delX;
-	//	par1[1] = par1[1] + delY;
-	//	break;
-	//case vtkEllipseRepresentation::AdjustingP1:
-	//	par2[0] = par2[0] + delX2;
-	//	par1[1] = par1[1] + delY2;
-	//	break;
-	//case vtkEllipseRepresentation::AdjustingP2:
-	//	par2[0] = par2[0] + delX;
-	//	par2[1] = par2[1] + delY;
-	//	break;
-	//case vtkEllipseRepresentation::AdjustingP3:
-	//	par1[0] = par1[0] + delX2;
-	//	par2[1] = par2[1] + delY2;
-	//	break;
-	//case vtkEllipseRepresentation::AdjustingE0:
-	//	par1[1] = par1[1] + delY;
-	//	if (this->ProportionalResize)
-	//	{
-	//		par2[1] = par2[1] - delY;
-	//		par1[0] = par1[0] + delX;
-	//		par2[0] = par2[0] - delX;
-	//	}
-	//	break;
-	//case vtkEllipseRepresentation::AdjustingE1:
-	//	par2[0] = par2[0] + delX;
-	//	if (this->ProportionalResize)
-	//	{
-	//		par1[0] = par1[0] - delX;
-	//		par1[1] = par1[1] - delY;
-	//		par2[1] = par2[1] + delY;
-	//	}
-	//	break;
-	//case vtkEllipseRepresentation::AdjustingE2:
-	//	par2[1] = par2[1] + delY;
-	//	if (this->ProportionalResize)
-	//	{
-	//		par1[1] = par1[1] - delY;
-	//		par1[0] = par1[0] - delX;
-	//		par2[0] = par2[0] + delX;
-	//	}
-	//	break;
-	//case vtkEllipseRepresentation::AdjustingE3:
-	//	par1[0] = par1[0] + delX;
-	//	if (this->ProportionalResize)
-	//	{
-	//		par2[0] = par2[0] - delX;
-	//		par1[1] = par1[1] + delY;
-	//		par2[1] = par2[1] - delY;
-	//	}
-	//	break;
 	case vtkEllipseRepresentation::Inside:
 		if (this->Moving)
 		{
@@ -280,10 +227,6 @@ void vtkEllipseRepresentation::NegotiateLayout()
 	this->GetSize(size);
 
 	// Update the initial ellipse geometry
-	//this->EWPoints->SetPoint(0, 0.0, 0.0, 0.0); //may be updated by the subclass
-	//this->EWPoints->SetPoint(1, size[0], 0.0, 0.0);
-	//this->EWPoints->SetPoint(2, size[0], size[1], 0.0);
-	//this->EWPoints->SetPoint(3, 0.0, size[1], 0.0);
 	for (unsigned int i = 0; i < this->Resolution; i++)
 	{
 		const double angle = 2.0 * vtkMath::Pi() * static_cast<double>(i) /
@@ -304,16 +247,21 @@ int vtkEllipseRepresentation::ComputeInteractionState(int X, int Y, int vtkNotUs
 	// check for poximinity to control points
 	// Figure out where we are in the widget. Exclude inside and outside case first.
 	double center[2];
-	center[0] = pos1[0] + pos2[0] / 2.0;
-	center[1] = pos1[1] + pos2[1] / 2.0;
-	double a = pos2[0] / 2.0;
-	double b = pos2[1] / 2.0;
+	center[0] = (pos1[0] + pos2[0]) / 2.0;
+	center[1] = (pos1[1] + pos2[1]) / 2.0;
+	double a = (pos2[0]-pos1[0]) / 2.0;
+	double b = (pos2[1] - pos1[1]) / 2.0;
+
 	auto ellipse = [](int x, int y, double *center, double a, double b, double tolerence)->_InteractionState {
-		double dist = pow((x - center[0]) / a, 2) + pow((y - center[1]) / b, 2);
-		if (dist < 1 - tolerence)
-			return Inside;
-		else if (dist > 1 + tolerence)
+		// ellipse equation: [(x-x0)/a]^2 + [(y-y0)/b]^2 = 1, where a and b are associated to major and minor axis length
+
+		// create two ellipses, one larger and one smaller than the drawn ellipse, any region between the two ellipses is considered as edge
+		double distBig = pow((x - center[0]) / (a+tolerence), 2) + pow((y - center[1]) / (b+tolerence), 2);
+		double distSmall = pow((x - center[0]) / (a-tolerence), 2) + pow((y - center[1]) / (b-tolerence), 2);
+		if (distBig > 1)
 			return Outside;
+		else if (distSmall < 1)
+			return Inside;
 		else
 			return Edge;
 	};
@@ -345,176 +293,12 @@ int vtkEllipseRepresentation::ComputeInteractionState(int X, int Y, int vtkNotUs
 		}
 		else
 		{
-			if (this->Moving)
-			{
-				// FIXME: This must be wrong.  Moving is not an entry in the
-				// _InteractionState enum.  It is an ivar flag and it has no business
-				// being set to InteractionState.  This just happens to work because
-				// Inside happens to be 1, and this gets set when Moving is 1.
-				this->InteractionState = vtkEllipseRepresentation::Moving;
-			}
-			else
-			{
-				this->InteractionState = vtkEllipseRepresentation::Edge;
-			}
+			this->InteractionState = vtkEllipseRepresentation::Edge;
 		}
 	}
 
-	//
-
-
-
-	//else 
-	//{
-	//	// Now check for proximinity to edges and points
-	//	int e0 = (Y >= (pos1[1] - this->Tolerance) && Y <= (pos1[1] + this->Tolerance));
-	//	int e1 = (X >= (pos2[0] - this->Tolerance) && X <= (pos2[0] + this->Tolerance));
-	//	int e2 = (Y >= (pos2[1] - this->Tolerance) && Y <= (pos2[1] + this->Tolerance));
-	//	int e3 = (X >= (pos1[0] - this->Tolerance) && X <= (pos1[0] + this->Tolerance));
-
-	//	//int adjustHorizontalEdges = (this->ShowHorizontalEllipse != Ellipse_OFF);
-	//	//int adjustVerticalEdges = (this->ShowVerticalEllipse != Ellipse_OFF);
-	//	int adjustPoints = (this->ShowEllipse != ELLIPSE_OFF);
-
-	//	if (e0 && e1 && adjustPoints)
-	//	{
-	//		this->InteractionState = vtkEllipseRepresentation::AdjustingP1;
-	//	}
-	//	else if (e1 && e2 && adjustPoints)
-	//	{
-	//		this->InteractionState = vtkEllipseRepresentation::AdjustingP2;
-	//	}
-	//	else if (e2 && e3 && adjustPoints)
-	//	{
-	//		this->InteractionState = vtkEllipseRepresentation::AdjustingP3;
-	//	}
-	//	else if (e3 && e0 && adjustPoints)
-	//	{
-	//		this->InteractionState = vtkEllipseRepresentation::AdjustingP0;
-	//	}
-
-	//	//// Edges
-	//	//else if (e0 || e1 || e2 || e3)
-	//	//{
-	//	//	if (e0 && adjustHorizontalEdges)
-	//	//	{
-	//	//		this->InteractionState = vtkEllipseRepresentation::AdjustingE0;
-	//	//	}
-	//	//	else if (e1 && adjustVerticalEdges)
-	//	//	{
-	//	//		this->InteractionState = vtkEllipseRepresentation::AdjustingE1;
-	//	//	}
-	//	//	else if (e2 && adjustHorizontalEdges)
-	//	//	{
-	//	//		this->InteractionState = vtkEllipseRepresentation::AdjustingE2;
-	//	//	}
-	//	//	else if (e3 && adjustVerticalEdges)
-	//	//	{
-	//	//		this->InteractionState = vtkEllipseRepresentation::AdjustingE3;
-	//	//	}
-	//	//}
-
-	//	else // must be interior
-	//	{
-	//		if (this->Moving)
-	//		{
-	//			// FIXME: This must be wrong.  Moving is not an entry in the
-	//			// _InteractionState enum.  It is an ivar flag and it has no business
-	//			// being set to InteractionState.  This just happens to work because
-	//			// Inside happens to be 1, and this gets set when Moving is 1.
-	//			this->InteractionState = vtkEllipseRepresentation::Moving;
-	//		}
-	//		else
-	//		{
-	//			this->InteractionState = vtkEllipseRepresentation::Inside;
-	//		}
-	//	}
-	//}//else inside or on Ellipse
-	////this->UpdateShowEllipse();
-
 	return this->InteractionState;
 }
-
-////-------------------------------------------------------------------------
-//void vtkEllipseRepresentation::UpdateShowEllipse()
-//{
-//	enum {
-//		NoEllipse = 0x00,
-//		ShowEllipse = 0x01
-//	};
-//	int currentEllipse = NoEllipse;
-//	switch (this->EWPolyData->GetLines()->GetNumberOfCells())
-//	{
-//	case 3:
-//		currentEllipse = ShowEllipse;
-//		break;
-//	case 0:
-//	case 1:
-//	case 2: 
-//	default: // not supported
-//		currentEllipse = NoEllipse;
-//		break;
-//	}
-//	int newEllipse = NoEllipse;
-//	if (this->ShowEllipse == this->ShowHorizontalEllipse)
-//	{
-//		newEllipse =
-//			(this->ShowVerticalEllipse == Ellipse_ON ||
-//			(this->ShowVerticalEllipse == Ellipse_ACTIVE &&
-//				this->InteractionState != vtkEllipseRepresentation::Outside)) ? ShowEllipse : NoEllipse;
-//	}
-//	else
-//	{
-//		newEllipse = newEllipse |
-//			((this->ShowVerticalEllipse == Ellipse_ON ||
-//			(this->ShowVerticalEllipse == Ellipse_ACTIVE &&
-//				this->InteractionState != vtkEllipseRepresentation::Outside)) ? VerticalEllipse : NoEllipse);
-//		newEllipse = newEllipse |
-//			((this->ShowHorizontalEllipse == Ellipse_ON ||
-//			(this->ShowHorizontalEllipse == Ellipse_ACTIVE &&
-//				this->InteractionState != vtkEllipseRepresentation::Outside)) ? HorizontalEllipse : NoEllipse);
-//	}
-//	bool visible = (newEllipse != NoEllipse);
-//	if (currentEllipse != newEllipse &&
-//		visible)
-//	{
-//		vtkCellArray *outline = vtkCellArray::New();
-//		switch (newEllipse)
-//		{
-//		case AllEllipses:
-//			outline->InsertNextCell(5);
-//			outline->InsertCellPoint(0);
-//			outline->InsertCellPoint(1);
-//			outline->InsertCellPoint(2);
-//			outline->InsertCellPoint(3);
-//			outline->InsertCellPoint(0);
-//			break;
-//		case VerticalEllipse:
-//			outline->InsertNextCell(2);
-//			outline->InsertCellPoint(1);
-//			outline->InsertCellPoint(2);
-//			outline->InsertNextCell(2);
-//			outline->InsertCellPoint(3);
-//			outline->InsertCellPoint(0);
-//			break;
-//		case HorizontalEllipse:
-//			outline->InsertNextCell(2);
-//			outline->InsertCellPoint(0);
-//			outline->InsertCellPoint(1);
-//			outline->InsertNextCell(2);
-//			outline->InsertCellPoint(2);
-//			outline->InsertCellPoint(3);
-//			break;
-//		default:
-//			break;
-//		}
-//		this->EWPolyData->SetLines(outline);
-//		outline->Delete();
-//		this->EWPolyData->Modified();
-//		this->Modified();
-//	}
-//	this->EWActor->SetVisibility(visible);
-//}
 
 //-------------------------------------------------------------------------
 void vtkEllipseRepresentation::BuildRepresentation()

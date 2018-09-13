@@ -20,7 +20,9 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkWidgetCallbackMapper.h"
 #include "vtkEvent.h"
 #include "vtkWidgetEvent.h"
-
+#include "vtkActor2D.h"
+#include "vtkProperty2D.h"
+#include "vtkSmartPointer.h"
 
 vtkStandardNewMacro(vtkEllipseWidget);
 
@@ -90,6 +92,37 @@ void vtkEllipseWidget::SetCursor(int cState)
 	}
 }
 
+void vtkEllipseWidget::SetEdgeColor(int cState)
+{
+	switch (cState)
+	{
+	case vtkEllipseRepresentation::AdjustingP0:
+	case vtkEllipseRepresentation::AdjustingP1:
+	case vtkEllipseRepresentation::AdjustingP2:
+	case vtkEllipseRepresentation::AdjustingP3:
+	case vtkEllipseRepresentation::Edge:
+	{
+		vtkSmartPointer<vtkPropCollection>actorCollection = vtkSmartPointer<vtkPropCollection>::New();
+		this->GetEllipseRepresentation()->GetActors2D(actorCollection);
+		vtkActor2D* ellipseActor = (vtkActor2D*)(actorCollection->GetLastProp());
+		ellipseActor->GetProperty()->SetColor(1, 1, 0);
+		this->Interactor->Render();
+		break;
+	}
+	default:
+	{
+		vtkSmartPointer<vtkPropCollection>actorCollection = vtkSmartPointer<vtkPropCollection>::New();
+		this->GetEllipseRepresentation()->GetActors2D(actorCollection);
+		//actorCollection->Print(std::cout);
+		vtkActor2D* ellipseActor = (vtkActor2D*)(actorCollection->GetLastProp());
+		ellipseActor->GetProperty()->SetColor(1, 1, 1);
+		this->Interactor->Render();
+		break;
+	}
+
+	}
+}
+
 //-------------------------------------------------------------------------
 void vtkEllipseWidget::SelectAction(vtkAbstractWidget *w)
 {
@@ -114,9 +147,6 @@ void vtkEllipseWidget::SelectAction(vtkAbstractWidget *w)
 	// cursor (i.e., the MoveAction may have set the cursor previously, but this
 	// method is necessary to maintain the proper cursor shape)..
 	self->SetCursor(self->WidgetRep->GetInteractionState());
-
-	// edge color
-	//self->SetEdgeColor(self->WidgetRep->)
 
 	// convert to normalized viewport coordinates
 	double XF = static_cast<double>(X);
@@ -209,6 +239,7 @@ void vtkEllipseWidget::MoveAction(vtkAbstractWidget *w)
 		self->WidgetRep->ComputeInteractionState(X, Y);
 		int stateAfter = self->WidgetRep->GetInteractionState();
 		self->SetCursor(stateAfter);
+		self->SetEdgeColor(stateAfter);
 
 		vtkEllipseRepresentation* EllipseRepresentation =
 			reinterpret_cast<vtkEllipseRepresentation*>(self->WidgetRep);
