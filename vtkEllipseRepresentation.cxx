@@ -249,8 +249,8 @@ int vtkEllipseRepresentation::ComputeInteractionState(int X, int Y, int vtkNotUs
 	double center[2];
 	center[0] = (pos1[0] + pos2[0]) / 2.0;
 	center[1] = (pos1[1] + pos2[1]) / 2.0;
-	double a = (pos2[0]-pos1[0]) / 2.0;
-	double b = (pos2[1] - pos1[1]) / 2.0;
+	double a = abs(pos2[0] - pos1[0]) / 2.0;
+	double b = abs(pos2[1] - pos1[1]) / 2.0;
 
 	auto ellipse = [](int x, int y, double *center, double a, double b, double tolerence)->_InteractionState {
 		// ellipse equation: [(x-x0)/a]^2 + [(y-y0)/b]^2 = 1, where a and b are associated to major and minor axis length
